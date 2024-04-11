@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Robot Simulation</title>
+    <script type="text/javascript" src="https://atlas.microsoft.com/sdk/js/atlas.min.js"></script>
+</head>
+
+<body>
+    <div id="map" style="height: 500px;"></div>
+    <script>
+        var map = new atlas.Map('map', {
+            center: [-122.3321, 47.6062],
+            zoom: 10,
+            view: 'Auto',
+
+            authOptions: {
+                authType: 'subscriptionKey',
+                subscriptionKey: 'VEC8jnHVVpp0189S0UhDXGia3hw1iVPGRNU-bVn0dTE'
+            }
+        });
+
+        function simulateRoute() {
+            fetch('/simulate')
+                .then(response => response.json())
+                .then(data => {
+                    var route = data.routes[0];
+                    var leg = route.legs[0];
+                    var steps = leg.steps;
+                    var cursorIndex = 0;
+
+                    var interval = setInterval(function () {
+                        if (cursorIndex >= steps.length) {
+                            clearInterval(interval);
+                            return;
+                        }
+
+                        var step = steps[cursorIndex];
+                        var maneuver = step.maneuver;
+                        var coordinates = maneuver.point.coordinates;
+                        map.setCamera({ center: coordinates, zoom: 14 });
+                        cursorIndex++;
+                    }, 2000);
+                });
+        }
+
+        simulateRoute();
+    </script>
+</body>
+
+</html>
